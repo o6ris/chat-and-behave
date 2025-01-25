@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Sequelize } = require('sequelize');
-const UserModel = require('./models/User');
+const UserModel = require('./models/user');
+const RoomModel = require('./models/room');
 
 // Initialize Express
 const app = express();
@@ -10,6 +11,15 @@ const PORT = 3000;
 // Middleware
 app.use(bodyParser.json());
 
+// Define Models
+const Room = RoomModel(sequelize);
+const User = UserModel(sequelize);
+
+// Define Relationships
+Room.hasMany(User, { as: 'users', foreignKey: 'roomId' }); // A Room has many Users
+User.belongsTo(Room, { foreignKey: 'roomId' }); // A User belongs to a Room
+
+
 // Initialize Sequelize
 const sequelize = new Sequelize('database', 'username', 'password', {
   host: 'localhost',
@@ -17,8 +27,7 @@ const sequelize = new Sequelize('database', 'username', 'password', {
   storage: './database.sqlite', // Use SQLite for simplicity
 });
 
-// Import and Initialize User model
-const User = UserModel(sequelize);
+
 
 // REST Endpoints
 
